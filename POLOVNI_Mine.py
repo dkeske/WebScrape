@@ -48,13 +48,13 @@ while (x<45):
 			#Kupe     3
 
 			if "Limuzina" in karoserija:
-				karos = 0
+				karos = "1,0,0"
 			if "bek" in karoserija:
-				karos = 1
+				karos = "0,1,0"
 			if "Karavan" in karoserija:
-				karos = 2
+				karos = "0,0,1"
 			if "Kupe" in karoserija:
-				karos = 3
+				karos = "0,0,0"
 
 			gorivo = infoArray[2]
 
@@ -76,10 +76,13 @@ while (x<45):
 				writeF = str(kw) + "," + km + "," + year + ","+ str(klima) + ","+ str(menjac)+","+str(karos) +'\n'
 				writeP = price + '\n'
 
-				if ("Manu" and "Auto") not in writeF:
+				if "Manu" in writeF:
+					print("Manu found")
+				elif "Auto" in writeF:
+					print("Auto found")
+				else:
 					f.write(writeF)
 					p.write(writeP)
-
 			except Exception as e:
 				errorFile.write(str(x) + '********' + str(e) + '********' + '\n')
 				pass

@@ -1,29 +1,47 @@
 import numpy as np 
-from sklearn import linear_model, datasets
+from sklearn import linear_model, datasets, metrics
+import math
 
-f = open("outputfilePOLOVNI.txt")
-g = open("outputfilePOLOVNIcena.txt")
-h = open("ocena.txt", "w")
+def makeModel():
+	
+	f = open("outputfilePOLOVNI.txt")
+	g = open("outputfilePOLOVNIcena.txt")
+	h = open("ocena.txt", "w")
 
-dataParams = np.loadtxt(f, delimiter=',')
-dataPrice = np.loadtxt(g)
-#odnos 70:30
-dataParams_train = dataParams[:-200]
-dataParams_test = dataParams[-200:]
+	dataParams = np.loadtxt(f, delimiter=',')
+	dataPrice = np.loadtxt(g)
 
-dataPrice_train = dataPrice[:-200]
-dataPrice_test = dataPrice[-200:]
+	rowNumParams = dataParams.shape[0]
+	rowNumPrice = dataPrice.shape[0]
+	#odnos 70:30
+	dataParams_train = dataParams[:rowNumParams*0.7]
+	dataParams_test = dataParams[rowNumParams*0.7:]
 
-#clf = linear_model.LinearRegression(normalize=True)
-clf = linear_model.Ridge (alpha = .3, normalize=True)
-clf.fit(dataParams_train, dataPrice_train)
+	dataPrice_train = dataPrice[:rowNumPrice*0.7]
+	dataPrice_test = dataPrice[rowNumPrice*0.7:]
 
-print(np.mean(clf.predict(dataParams_test)-dataPrice_test)**2)
-print("Koeficijenti: ")
-print(clf.coef_)
-print("Konstanta: ")
-print(clf.intercept_)
-#print("Razlika: ")
-#print(clf.predict(dataParams_test)-dataPrice_test)
-np.savetxt(h, clf.predict(dataParams_test)-dataPrice_test, fmt='%.2f')
-#recall, precision accuracy
+	clf = linear_model.LinearRegression(normalize=True, n_jobs=-1)
+	# clf = linear_model.Ridge (alpha = .2, normalize=True)
+
+	clf.fit(dataParams_train, dataPrice_train)
+
+	predicted = clf.predict(dataParams_test)
+
+	mean_abs_error = metrics.mean_absolute_error(dataPrice_test, predicted)
+	mean_sqr_error = metrics.mean_squared_error(dataPrice_test, predicted)
+	print("Mean absolute error")
+	print(mean_abs_error)
+	print("Root mean squared error")
+	print(math.sqrt(mean_sqr_error))
+
+	# print(np.mean(clf.predict(dataParams_test)-dataPrice_test)**2)
+	print("Coefficients: ")
+	print(clf.coef_)
+	# print("Konstanta: ")
+	# print(clf.intercept_)
+	print("How well does the model fit the data? 0-1")
+	print(clf.score(dataParams_test, dataPrice_test))
+	# print("Razlika: ")
+	# print(clf.predict(dataParams_test)-dataPrice_test)
+	# np.savetxt(h, clf.predict(dataParams_test)-dataPrice_test, fmt='%.2f')
+	# recall, precision accuracy ?!
